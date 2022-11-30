@@ -34,7 +34,7 @@ def import_data(path, type, fraction=1):
     return result
 
 
-def predict(input_data, answer_question_function):
+def predict(input_data, answer_question_function, model_id=1):
     """
     Uses a given answer_question function to predict answers and maps them to respective question ID
     :param input_data: pandas DataFrame with 3 columns: question, reference, question_ID
@@ -46,7 +46,7 @@ def predict(input_data, answer_question_function):
         question = row['question']
         reference = row['reference']
         question_ID = row['question_ID']
-        answer = answer_question_function(question, reference)
+        answer = answer_question_function(question, reference, model_id)
         result.append({'question_ID': question_ID, 'answer': answer})
     return pd.DataFrame.from_records(result)
 

@@ -18,7 +18,7 @@ models = {
 
 
 # Make a function to predict the answer
-def answer_question(question, reference, model_id=1):
+def answer_question(question, reference, model_id):
     """
     Returns answer to given question by reference
     :param question: Input question
