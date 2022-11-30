@@ -1,0 +1,11 @@
+Downloading:   0%|          | 0.00/466k [00:00<?, ?B/s]Downloading:  82%|████████▏ | 382k/466k [00:00<00:00, 3.82MB/s]Downloading: 100%|██████████| 466k/466k [00:00<00:00, 4.12MB/s]
+Traceback (most recent call last):
+  File "/home/aariyak/SQuAD-with-BERT/main.py", line 1, in <module>
+    from answer_question import answer_question
+  File "/home/aariyak/SQuAD-with-BERT/answer_question.py", line 49, in <module>
+    print(answer_question('When did Rollo begin to arrive in Normandy?', 'In the course of the 10th century, the initially destructive incursions of Norse war bands into the rivers of France evolved into more permanent encampments that included local women and personal property. The Duchy of Normandy, which began in 911 as a fiefdom, was established by the treaty of Saint-Clair-sur-Epte between King Charles III of West Francia and the famed Viking ruler Rollo, and was situated in the former Frankish kingdom of Neustria. The treaty offered Rollo and his men the French lands between the river Epte and the Atlantic coast in exchange for their protection against further Viking incursions. The area corresponded to the northern part of present-day Upper Normandy down to the river Seine, but the Duchy would eventually extend west beyond the Seine. The territory was roughly equivalent to the old province of Rouen, and reproduced the Roman administrative structure of Gallia Lugdunensis II (part of the former Gallia Lugdunensis)', 2))
+  File "/home/aariyak/SQuAD-with-BERT/answer_question.py", line 46, in answer_question
+    answer = tokenizer.convert_tokens_to_string(token_IDs[answer_start:answer_end])  # +1 to include last token
+  File "/home/aariyak/miniconda3/envs/DS595RL/lib/python3.9/site-packages/transformers/tokenization_utils_fast.py", line 538, in convert_tokens_to_string
+    return self.backend_tokenizer.decoder.decode(tokens)
+TypeError: argument 'tokens': 'Encoding' object cannot be converted to 'PyString'
