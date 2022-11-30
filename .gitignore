@@ -1,0 +1,6 @@
+
+data/processed_data.csv
+*.iml
+*.xml
+*.pyc
+.DS_Store
