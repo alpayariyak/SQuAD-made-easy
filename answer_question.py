@@ -7,8 +7,8 @@ model_name_2 = 'mrm8488/spanbert-finetuned-squadv2' # spanBERT model trained on 
 
 models = {
     1: {
-        'model': BertForQuestionAnswering.from_pretrained(model_name_1),
-        'tokenizer': BertTokenizer.from_pretrained(model_name_1)
+        'model': AutoModelForQuestionAnswering.from_pretrained(model_name_1),
+        'tokenizer': AutoTokenizer.from_pretrained(model_name_1)
     },
     2: {
         'model': AutoModelForQuestionAnswering.from_pretrained(model_name_2),
@@ -30,22 +30,20 @@ def answer_question(question, reference, model_id):
     model = models[model_id]['model']
     tokenizer = models[model_id]['tokenizer']
 
-    # Tokenize question and reference and assign IDs
-    token_IDs = tokenizer.encode(question, reference, max_length=512, truncation=True)
+    # Tokenize the question and reference and assign IDs
+    token_IDs = tokenizer.encode_plus(question, reference, max_length=512, truncation=True, return_tensors='pt')
 
-    # Locate [SEP] token and split token_IDs into segments corresponding to question and reference
-    num_a_tokens = token_IDs.index(tokenizer.sep_token_id) + 1  # +1 to include [SEP] token
-    num_b_tokens = len(token_IDs) - num_a_tokens
-    mask = [1] * num_a_tokens + [0] * num_b_tokens  # 0 for question, 1 for reference
+    # Extract the tensor containing the token IDs from the dictionary
+    input_tokens = token_IDs["input_ids"]
 
-    if len(mask) != len(token_IDs):
-        raise AssertionError('Mask has incorrect length')
-
-    model_output = model(torch.tensor([token_IDs]), token_type_ids=torch.tensor([mask]), return_dict=True)
+    # Make the model predict the start and end tokens of the answer
+    model_output = model(input_tokens)
     start_scores, end_scores = model_output.start_logits, model_output.end_logits
 
     # Find the combination of start and end tokens that has the highest score
     answer_start = torch.argmax(start_scores)
-    answer_end = torch.argmax(end_scores)
-    answer = tokenizer.decode(token_IDs[answer_start:answer_end + 1])  # +1 to include last token
+    answer_end = torch.argmax(end_scores)+1
+    answer = tokenizer.convert_tokens_to_string(token_IDs[answer_start:answer_end])  # +1 to include last token
     return answer
+
+print(answer_question('When did Rollo begin to arrive in Normandy?', 'In the course of the 10th century, the initially destructive incursions of Norse war bands into the rivers of France evolved into more permanent encampments that included local women and personal property. The Duchy of Normandy, which began in 911 as a fiefdom, was established by the treaty of Saint-Clair-sur-Epte between King Charles III of West Francia and the famed Viking ruler Rollo, and was situated in the former Frankish kingdom of Neustria. The treaty offered Rollo and his men the French lands between the river Epte and the Atlantic coast in exchange for their protection against further Viking incursions. The area corresponded to the northern part of present-day Upper Normandy down to the river Seine, but the Duchy would eventually extend west beyond the Seine. The territory was roughly equivalent to the old province of Rouen, and reproduced the Roman administrative structure of Gallia Lugdunensis II (part of the former Gallia Lugdunensis)', 2))
