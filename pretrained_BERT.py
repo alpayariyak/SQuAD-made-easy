@@ -20,12 +20,12 @@ def answer_question(question, reference):
     """
 
     # Tokenize question and reference and assign IDs
-    token_IDs = tokenizer.encode(question, reference)
+    token_IDs = tokenizer.encode(question, reference, max_length=512, truncation=True)
 
     # Locate [SEP] token and split token_IDs into segments corresponding to question and reference
     num_a_tokens = token_IDs.index(tokenizer.sep_token_id) + 1  # +1 to include [SEP] token
     num_b_tokens = len(token_IDs) - num_a_tokens
-    mask = [1] * num_a_tokens + [0] * num_b_tokens  # 1 for question, 0 for reference
+    mask = [1] * num_a_tokens + [0] * num_b_tokens  # 0 for question, 1 for reference
 
     if len(mask) != len(token_IDs):
         raise AssertionError('Mask has incorrect length')
@@ -38,3 +38,4 @@ def answer_question(question, reference):
     answer_end = torch.argmax(end_scores)
     answer = tokenizer.decode(token_IDs[answer_start:answer_end + 1])  # +1 to include last token
     return answer
+
