@@ -1,4 +1,4 @@
-import pretrained_BERT
+import answer_question
 from predict import import_data, predict, prediction_to_json
 import subprocess
 

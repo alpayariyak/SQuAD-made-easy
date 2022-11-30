@@ -1,23 +1,34 @@
 import torch
-from transformers import BertForQuestionAnswering, BertTokenizer
+from transformers import BertForQuestionAnswering, BertTokenizer, AutoTokenizer, AutoModelForQuestionAnswering
 
-# Load Model Fine-Tuned on SQuAD
-model_name = 'bert-large-uncased-whole-word-masking-finetuned-squad'
+# Define models
+model_name_1 = 'bert-large-uncased-whole-word-masking-finetuned-squad' # BERT model trained on SQuAD
+model_name_2 = 'mrm8488/spanbert-finetuned-squadv2' # spanBERT model trained on SQuAD 2.0
 
-model = BertForQuestionAnswering.from_pretrained(model_name)
-
-tokenizer = BertTokenizer.from_pretrained(model_name)
+models = {
+    1: {
+        'model': BertForQuestionAnswering.from_pretrained(model_name_1),
+        'tokenizer': BertTokenizer.from_pretrained(model_name_1)
+    },
+    2: {
+        'model': AutoModelForQuestionAnswering.from_pretrained(model_name_2),
+        'tokenizer': AutoTokenizer.from_pretrained(model_name_2)
+    }
+}
 
 
 # Make a function to predict the answer
-
-def answer_question(question, reference):
+def answer_question(question, reference, model_id=1):
     """
     Returns answer to given question by reference
     :param question: Input question
     :param reference: Data to look for answer in
+    :param model_id: ID of model to use for prediction
     :return: answer
     """
+
+    model = models[model_id]['model']
+    tokenizer = models[model_id]['tokenizer']
 
     # Tokenize question and reference and assign IDs
     token_IDs = tokenizer.encode(question, reference, max_length=512, truncation=True)
@@ -38,4 +49,3 @@ def answer_question(question, reference):
     answer_end = torch.argmax(end_scores)
     answer = tokenizer.decode(token_IDs[answer_start:answer_end + 1])  # +1 to include last token
     return answer
-
