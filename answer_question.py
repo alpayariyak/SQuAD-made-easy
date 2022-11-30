@@ -35,15 +35,14 @@ def answer_question(question, reference, model_id):
 
     # Extract the tensor containing the token IDs from the dictionary
     input_tokens = token_IDs["input_ids"]
-
+    token_type_ids = token_IDs["token_type_ids"]
+    attention_mask = token_IDs["attention_mask"]
     # Make the model predict the start and end tokens of the answer
-    model_output = model(input_tokens)
+    model_output = model(input_tokens, token_type_ids=token_type_ids, attention_mask=attention_mask)
     start_scores, end_scores = model_output.start_logits, model_output.end_logits
 
     # Find the combination of start and end tokens that has the highest score
     answer_start = torch.argmax(start_scores)
-    answer_end = torch.argmax(end_scores)+1
-    answer = tokenizer.convert_tokens_to_string(token_IDs[answer_start:answer_end])  # +1 to include last token
+    answer_end = torch.argmax(end_scores)
+    answer = tokenizer.decode(input_tokens.squeeze()[answer_start:answer_end + 1].tolist())  # +1 to include last token
     return answer
-
-print(answer_question('When did Rollo begin to arrive in Normandy?', 'In the course of the 10th century, the initially destructive incursions of Norse war bands into the rivers of France evolved into more permanent encampments that included local women and personal property. The Duchy of Normandy, which began in 911 as a fiefdom, was established by the treaty of Saint-Clair-sur-Epte between King Charles III of West Francia and the famed Viking ruler Rollo, and was situated in the former Frankish kingdom of Neustria. The treaty offered Rollo and his men the French lands between the river Epte and the Atlantic coast in exchange for their protection against further Viking incursions. The area corresponded to the northern part of present-day Upper Normandy down to the river Seine, but the Duchy would eventually extend west beyond the Seine. The territory was roughly equivalent to the old province of Rouen, and reproduced the Roman administrative structure of Gallia Lugdunensis II (part of the former Gallia Lugdunensis)', 2))
