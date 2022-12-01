@@ -45,4 +45,6 @@ def answer_question(question, reference, model_id):
     answer_start = torch.argmax(start_scores)
     answer_end = torch.argmax(end_scores)
     answer = tokenizer.decode(input_tokens.squeeze()[answer_start:answer_end + 1].tolist())  # +1 to include last token
+    special_tokens = ['[SEP]', '[CLS]', '[PAD]', '[UNK]']
+    answer = ' '.join([word for word in answer.split() if word not in special_tokens])
     return answer
