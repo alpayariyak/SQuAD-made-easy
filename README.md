@@ -1,13 +1,14 @@
 # SQuAD Made Easy
 This is a script that you can use to:
+- Generate predictions with your BERT model for the official SQuAD 2.0 dev set in the correct format for submission to the [SQuAD 2.0 leaderboard](https://rajpurkar.github.io/SQuAD-explorer/).
+- Add SQuAD 2.0 compatibility for models trained on SQuAD 1.1 by using a Binary Classifier I trained to detect unanswerable questions. This small addition can exponentially increase the model's performance.
 - Evaluate a BERT model of your choice on any SQuAD format dataset using the official evaluation script.
-- Generate predictions with your model for the official SQuAD 2.0 dev set in the correct format for submission to the [SQuAD 2.0 leaderboard](https://rajpurkar.github.io/SQuAD-explorer/).
 - Generate predictions with your model for any SQuAD format dataset.
 
 To use your own model, you need to upload it to the Hugging Face model hub. You can find more information about how to do this [here](https://huggingface.co/transformers/model_sharing.html).
 
 
-## What is SQuAD 2.0?
+## What is SQuAD?
 The Stanford Question Answering Dataset (SQuAD) is a reading comprehension dataset, consisting of questions posed by crowdworkers on a set of Wikipedia articles, where the answer to every question is a segment of text, or span, from the corresponding reading passage, or the question might be unanswerable. SQuAD 2.0 is an extension of SQuAD 1.1, with the addition of approximately 50,000 new, unanswerable questions written adversarially by crowdworkers to look similar to answerable ones. To do well on SQuAD, systems must not only answer questions when possible, but also determine when no answer is supported by the paragraph and abstain from answering.
 
 <img src="images/SQuAD.png" width="50%" height="50%">
