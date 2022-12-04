@@ -1,13 +1,36 @@
-from answer_question import answer_question
-from predict import import_data, predict, prediction_to_json
+from predict import predict, prediction_to_json
 import subprocess
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering
+import argparse
+import import_data
 
-models_to_test = [('BERT_large_finetuned', 1), ('spanBERT', 2)]
+# Parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--model_name', type=str, default='bert-large-uncased-whole-word-masking-finetuned-squad',
+                    help='The name of the model from the hugging face transformers library to use for prediction.')
+parser.add_argument('--use_classifier', type=bool, default=False,
+                    help='Whether to use the unanswerable classifier or not.')
+parser.add_argument('--input_file', type=str, default='data/dev-v2.0.json',
+                    help='The path to the input JSON file containing the test data.')
+parser.add_argument('--output_file', type=str, default='predictions.json',
+                    help='The path to save the output JSON file with the predictions to.')
+parser.add_argument('--eval_file', type=str, default='eval_result.json',
+                    help='The path to save the JSON file with the evaluation results to.')
+args = parser.parse_args()
 
 if __name__ == '__main__':
-    for model_name, model_id in models_to_test:
-        test_data = import_data('data/dev-v2.0.json', 'test')  # import test data
-        predictions = predict(test_data, answer_question, model_id)  # predict answers
-        prediction_to_json(predictions, f'predictions_{model_name}.json')  # save predictions to JSON
-        subprocess.run(['python', 'evaluate-v2.0.py', 'data/dev-v2.0.json', f'predictions_{model_name}.json', f'--out-file=eval_{model_name}.json'])  # evaluate predictions
+    # Import the data
+    test_data = import_data.import_data(args.input_file, 'test')
+
+    # Load the model and tokenizer
+    model = AutoModelForQuestionAnswering.from_pretrained(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
+
+    # Make predictions
+    predictions = predict(test_data, model, tokenizer, args.use_classifier)
+    prediction_to_json(predictions, args.output_file)
+
+    # Evaluate the predictions using the official SQuAD evaluation script
+    subprocess.run(['python', 'evaluate-v2.0.py', args.input_file, args.output_file,
+                    f'--out-file={args.eval_file}'])
 
